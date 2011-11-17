@@ -129,7 +129,7 @@ class ConsoleSummary():
         self.suite_cases = reporter.suite_cases
         
     def __str__(self):
-        output = "\n*****************************************************\n"
+        output = "\n*******************************************************\n"
         output += "Summary:\n"
         output += "Number of Test Cases:        " + str(self.suite_cases) + "\n"
         output += "Number of Tests:             " + str(self.suite_tests) + "\n"
@@ -139,7 +139,7 @@ class ConsoleSummary():
         output += "Number of Fatals:            " + str(self.suite_fatals) + "\n"
         output += "Number of Expected Fails:    " + str(self.suite_expected_fails) + "\n"
         output += "Number of Unexpected Passes: " + str(self.suite_unexpected_passes) + "\n"
-        output += "*****************************************************\n"
+        output += "*******************************************************\n"
 
         return output
 
@@ -183,6 +183,7 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
         self.suite_name = None
         self.case_name = None
         self.current_case = None
+        self.current_caseNumber = 0
         self.result_type = None
         self.result_time = None
         self.description = []
@@ -228,6 +229,7 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
             elif self.in_suite:
                 self.suite_start = datetime_from_string(
                         attributes.get("time"))
+                
         elif name == u"epilog":
             # We ignore epilog times
             pass
@@ -295,14 +297,15 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
 
     def endElement(self, name):
         if name == u"SquishReport":
+            if self.details_fh != None:
+                self.closeDetailsFH()
+
             self.fh.write(REPORT_END)
         elif name == u"test":
             if self.in_test:
                 self.in_test = False
             elif self.in_case:
                 self.in_case = False
-                if self.details_fh != None:
-                    self.closeDetailsFH()
         elif name == u"prolog":
             pass
         elif name == u"epilog":
@@ -377,6 +380,7 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
                     description=msg,
                     detailed_description=detail_msg,
                     valign=self.valign))
+            
             self.message = []
             self.in_message = False
      
@@ -391,8 +395,9 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
             effCount += " Errors: " + str(self.testcase_errors)
         if self.testcase_fatals > 0:
             effCount += " Fatals: " + str(self.testcase_fatals)
-            
-        self.fh.write(CASE_ITEM % dict(number=str(self.suite_cases), name=escape(self.current_case), valign=self.valign, start=datetime_from_string(self.attribute_time), color=self.testcase_color, thisEFF=effCount))
+        
+        self.current_caseNumber += 1   
+        self.fh.write(CASE_ITEM % dict(number=str(self.current_caseNumber), name=escape(self.current_case), valign=self.valign, start=datetime_from_string(self.attribute_time), color=self.testcase_color, thisEFF=effCount))
         
         self.testcase_color = u"#90ee90"
         self.testcase_fails = 0
@@ -400,12 +405,17 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
         self.testcase_fatals = 0
            
     def createDetailsPage(self, attributes):
+        if self.details_fh != None:
+            self.closeDetailsFH()
+        
         self.current_case = self.case_name
         self.attribute_time = attributes.get("time")
         details_file = os.path.abspath(os.path.join(self.opts.dir, os.path.basename(self.case_name + "_details.html")))
-        self.details_fh = codecs.open(details_file, "w", encoding="utf-8")
-        self.details_fh.write(DETAILS_START % dict(title=self.suite_name + "/" + self.case_name))
-
+        try:
+            self.details_fh = codecs.open(details_file, "w", encoding="utf-8")
+            self.details_fh.write(DETAILS_START % dict(title=self.suite_name + "/" + self.case_name))
+        except (EnvironmentError, ValueError, ReportError, xml.sax.SAXParseException), err:
+            print >>sys.stderr, err
 
 def escape_and_handle_image(description, preserve):
     match = re.search(ur"""saved\s+as\s+['"](?P<image>[^'"]+)['"]""",
