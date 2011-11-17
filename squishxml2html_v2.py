@@ -130,6 +130,7 @@ class ConsoleSummary():
         
     def __str__(self):
         output = "\n*****************************************************\n"
+        output += "Summary:\n"
         output += "Number of Test Cases:        " + str(self.suite_cases) + "\n"
         output += "Number of Tests:             " + str(self.suite_tests) + "\n"
         output += "Number of Passes:            " + str(self.suite_passes) + "\n"
