@@ -1,0 +1,43 @@
+/* 
+ * File Name: squishReportTableStyle.css
+ * Author: Joshua Niehus
+ * Date: 10/29/2011
+ * 
+ * Description: CSS styles associated with the squish report table. Used in conjunction with
+ * squishReportTable.js
+ */
+
+tr.zebraHover
+{
+    background-color: #FFFACD;
+}
+
+tr.testcase
+{
+    cursor: pointer;
+}
+
+table
+{
+    border-collapse: collapse;
+}
+
+table, th, td
+{
+    border: 2px solid #FFF9F0;
+}
+
+table.testcases, table.details
+{
+    width: 100%;
+}
+
+div.scroll
+{
+    width: 95%;
+    overflow: auto;
+    border: 1px solid #777;
+    background-color: #ccc;
+    padding: 8px;
+}
+
