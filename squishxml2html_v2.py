@@ -73,8 +73,18 @@ REPORT_START = u"""\
 <body>
 <h2>%%(title)s</h2>
 <h3>Summary</h3><table border="0">\n%s</table>
-<h3>Results</h3><div class="scroll"><table class="testcases" border="0">\n""" % (
-        SUMMARY_MARK + " " * SUMMARY_SIZE)
+<h3>Results</h3><div class="scroll">
+<table id="testcases" class="tablesorter" border="0">
+<thead>
+<tr> 
+    <th>Number</th> 
+    <th>Test Case Name</th> 
+    <th>DateTime</th> 
+    <th>Fault Summary</th> 
+</tr> 
+</thead>
+<tbody>
+\n""" % (SUMMARY_MARK + " " * SUMMARY_SIZE)
 
 DETAILS_START = u"""\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -85,10 +95,11 @@ DETAILS_START = u"""\
 <title>%%(title)s Details</title></head>
 <body>
 <h2>%%(title)s</h2>
-<h3>Details</h3><button type="button" id="previous">&larr;</button><button type="button" id="next">&rarr;</button><div class="scroll"><table class="details" border="0">\n""" %()
+<h3>Details</h3><button type="button" id="previous">&larr;</button><button type="button" id="next">&rarr;</button><div class="scroll"><table id="details" border="0">\n""" %()
 
-REPORT_END = u"""</table>\n
+REPORT_END = u"""</tbody></table>\n
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>\n
+<script src="../jquery.tablesorter.js"></script>\n
 <script src="../jquery.scrollTo-min.js"></script>\n
 <script src="../squishReportTable.js"></script>\n
 </body></html>\n"""
@@ -98,7 +109,7 @@ SUMMARY_ITEM = u"""<tr valign="%(valign)s" bgcolor="%(color)s">\
 </tr>\n"""
 
 CASE_ITEM = u"""<tr class="testcase" valign="%%(valign)s" bgcolor="%%(color)s"><td>%%(number)s</td><td class="tcName">\
-<b>%%(name)s</b></td><td colspan="4">%%(start)s</td><td>%%(thisEFF)s</td></tr>\n""" % ()
+<b>%%(name)s</b></td><td>%%(start)s</td><td>%%(thisEFF)s</td></tr>\n""" % ()
 
 VERIFICATION_ITEM = u"""<tr class="verification" valign="%%(valign)s" bgcolor="%s">\
 <td>%%(name)s</td><td colspan="4">%%(filename_and_line)s</td>\

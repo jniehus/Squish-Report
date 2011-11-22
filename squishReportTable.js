@@ -18,6 +18,8 @@ function navigate()
 var currentCount = -1;
 
 $(document).ready(function(){   
+    $("#testcases").tablesorter();
+    
     // set relative heights of table containers, this will keep nav buttons on details table to stay visible
     $('div.scroll').css('height', function() {
         return ($(window).height() * 0.85);
