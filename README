@@ -6,3 +6,6 @@ This will generate an 'output' directory which contains all the html files.
 Note that the HTML references the .js and .css files UP one directory.  You
 can change this behavior in the squishxml2html_v2.py script by modifying
 REPORT_START, DETAILS_START, and REPORT_END strings
+
+Note:
+It seems Chrome is shortcutting some javascript so it requires a refresh to get the navigation buttons working along with some of the div layouts. 
