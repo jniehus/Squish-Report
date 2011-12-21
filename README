@@ -8,15 +8,4 @@ can change this behavior in the squishxml2html_v2.py script by modifying
 REPORT_START, DETAILS_START, and REPORT_END strings
 
 Note:
-It seems Chrome is shortcutting some javascript so it requires a refresh to get the navigation buttons working along with some of the div layouts.
-
-Detail 'function () 
-{
-  var count = 0;
-  for (var i in this.values)
-    {
-      count++;
-    }
-  return count;
-}' and '1' are not equal 
- 
+It seems Chrome is shortcutting some javascript so it requires a refresh to get the navigation buttons working along with some of the div layouts. 
