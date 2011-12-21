@@ -109,7 +109,7 @@ SUMMARY_ITEM = u"""<tr valign="%(valign)s" bgcolor="%(color)s">\
 </tr>\n"""
 
 CASE_ITEM = u"""<tr class="testcase" valign="%%(valign)s" bgcolor="%%(color)s"><td>%%(number)s</td><td class="tcName">\
-<b>%%(name)s</b></td><td>%%(start)s</td><td>%%(thisEFF)s</td></tr>\n""" % ()
+<b>%%(name)s</b></td><td>%%(start)s</td><td>%%(thisFaultSummary)s</td></tr>\n""" % ()
 
 VERIFICATION_ITEM = u"""<tr class="verification" valign="%%(valign)s" bgcolor="%s">\
 <td>%%(name)s</td><td colspan="4">%%(filename_and_line)s</td>\
@@ -209,7 +209,9 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
         self.testcase_errors = 0
         self.testcase_fails = 0
         self.testcase_fatals = 0
-
+        self.testcase_expectedFails = 0
+        self.testcase_warnings = 0
+        self.testcase_unexpectedPass = 0
 
     def startElement(self, name, attributes):
         if name == u"SquishReport":
@@ -273,8 +275,10 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
                 self.testcase_color = FAIL_COLOR
             elif self.result_type in (u"XPASS", u"UPASS"):
                 self.suite_unexpected_passes += 1
+                self.testcase_unexpectedPass += 1
             elif self.result_type == u"XFAIL":
                 self.suite_expected_fails += 1
+                self.testcase_expectedFails += 1
             self.in_result = True
         elif name == u"description":
             if not (self.in_result or self.in_message):
@@ -362,6 +366,7 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
             color = LOG_COLOR
             if self.message_type == u"WARNING":
                 color = WARNING_COLOR
+                self.testcase_warnings += 1
             if self.message_type == u"ERROR":
                 color = ERROR_COLOR
                 self.testcase_color = ERROR_COLOR
@@ -399,21 +404,31 @@ class SquishReportHandler(xml.sax.handler.ContentHandler):
         self.details_fh.write(REPORT_END)
         self.details_fh.close()
         
-        effCount = ""
+        faultSummary = ""
         if self.testcase_fails > 0:
-            effCount += "Fails: " + str(self.testcase_fails)
+            faultSummary += "Fails: " + str(self.testcase_fails)
         if self.testcase_errors > 0:
-            effCount += " Errors: " + str(self.testcase_errors)
+            faultSummary += " Errors: " + str(self.testcase_errors)
         if self.testcase_fatals > 0:
-            effCount += " Fatals: " + str(self.testcase_fatals)
+            faultSummary += " Fatals: " + str(self.testcase_fatals)
+        if self.testcase_expectedFails > 0:
+            faultSummary += " Expected Failures: " + str(self.testcase_expectedFails)
+        if self.testcase_unexpectedPass > 0:
+            faultSummary += " Unexpected Passes: " + str(self.testcase_unexpectedPass)
+        if self.testcase_warnings > 0:
+            faultSummary += " Warnings: " + str(self.testcase_warnings)
+            
         
         self.current_caseNumber += 1   
-        self.fh.write(CASE_ITEM % dict(number=str(self.current_caseNumber), name=escape(self.current_case), valign=self.valign, start=datetime_from_string(self.attribute_time), color=self.testcase_color, thisEFF=effCount))
+        self.fh.write(CASE_ITEM % dict(number=str(self.current_caseNumber), name=escape(self.current_case), valign=self.valign, start=datetime_from_string(self.attribute_time), color=self.testcase_color, thisFaultSummary=faultSummary))
         
         self.testcase_color = u"#90ee90"
         self.testcase_fails = 0
         self.testcase_errors = 0
         self.testcase_fatals = 0
+        self.testcase_expectedFails = 0
+        self.testcase_warnings = 0
+        self.testcase_unexpectedPass = 0        
            
     def createDetailsPage(self, attributes):
         if self.details_fh != None:
