@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- encoding=utf8 -*-
 # Copyright (c) 2009-10 froglogic GmbH. All rights reserved.
 # This file is part of an example program for Squish---it may be used,
