@@ -42,7 +42,6 @@ WARNING_COLOR = u"#FFA500"  # orange
 FATAL_COLOR = u"#F08080"    # lightcoral
 CASE_COLOR = u"#90ee90"     # lightgreen
 
-
 INDEX_HTML_START = u"""\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -61,7 +60,8 @@ INDEX_ITEM = u"""<tr valign="%(valign)s" bgcolor="%(color)s">\
 <a href="%(url)s">%(name)s</a></td></tr>\n"""
 
 SUMMARY_MARK = "SzUzMzMzAzRzY" * 2
-SUMMARY_SIZE = 2000
+SUMMARY_SIZE = 4000
+JENKINSJOB = None
 
 REPORT_START = u"""\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -72,7 +72,10 @@ REPORT_START = u"""\
 <title>%%(title)s</title></head>
 <body>
 <h2>%%(title)s</h2>
-<h3>Summary</h3><table border="0">\n%s</table>
+
+<h3>Summary</h3>
+<table border="0">\n%s</table>
+
 <h3>Results</h3><div class="scroll">
 <table id="testcases" class="tablesorter" border="0">
 <thead>
@@ -497,9 +500,19 @@ def process_suite(opts, filename, index_fh=None):
 def write_summary_entry(valign, reporter, html_file):
     global CONSOLE_SUMMARY
     CONSOLE_SUMMARY = ConsoleSummary(reporter)
-    
+        
     summary = []
     color = NEUTRAL_COLOR
+    
+    # Jenkins Job Info
+    summary.append(SUMMARY_ITEM % dict(color=color, name="<b>Jenkins Job Information</b>", value="", extra="", valign=valign))
+
+    for attr, jjValue in sorted(JENKINSJOB.__dict__.iteritems()):
+        if str(jjValue) != "none":
+            summary.append(SUMMARY_ITEM % dict(color=color, name=attr, value=str(jjValue), extra="", valign=valign))
+        
+    summary.append(SUMMARY_ITEM % dict(color=color, name="|", value="", extra="", valign=valign))    
+    summary.append(SUMMARY_ITEM % dict(color=color, name="<b>Test Summary</b>", value="", extra="", valign=valign))    
     summary.append(SUMMARY_ITEM % dict(color=color, name="Test Cases",
             value=reporter.suite_cases, extra="", valign=valign))
     summary.append(SUMMARY_ITEM % dict(color=color, name="Tests",
@@ -596,7 +609,10 @@ def create_functions(opts):
 def main(args=None):
     if args is None:
         args = sys.argv
-            
+    
+    global JENKINSJOB
+    JENKINSJOB = args[2]
+        
     opts = Options()
     opts.dir = args[1]
     
