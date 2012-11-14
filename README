@@ -1,3 +1,5 @@
+Req. Python 2.7
+
 Open a command prompt to this directory and run the following python command:
 
 python convertTest.py
